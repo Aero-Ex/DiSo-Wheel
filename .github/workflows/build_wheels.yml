@@ -35,9 +35,14 @@ jobs:
           pip install torch==2.10.0+cu128 --index-url https://download.pytorch.org/whl/cu128
           pip install trimesh numpy
 
+      - name: Clone DiSo
+        uses: actions/checkout@v4
+        with:
+          repository: YuePan-Robotics/DiSo
+          path: DiSo
+
       - name: Build wheel for diso
         run: |
-          git clone https://github.com/YuePan-Robotics/DiSo.git
           cd DiSo
           python setup.py bdist_wheel
 
