@@ -28,12 +28,12 @@ jobs:
         with:
           cuda: ${{ matrix.cuda }}
 
-      - name: Install dependencies
+      - name: Verify CUDA
         run: |
-          pip install --upgrade pip setuptools wheel
-          # We use the index-url to get the specific torch version matching the user's environment
-          pip install torch==2.10.0+cu128 --index-url https://download.pytorch.org/whl/cu128
-          pip install trimesh numpy
+          echo "CUDA_PATH: $CUDA_PATH"
+          echo "CUDA_HOME: $CUDA_HOME"
+          nvcc --version
+          ls -l /usr/local/cuda-12.8/include/cuda_runtime.h || echo "cuda_runtime.h not found"
 
       - name: Clone DiSo
         uses: actions/checkout@v4
@@ -42,7 +42,14 @@ jobs:
           path: DiSo
 
       - name: Build wheel for diso
+        env:
+          CUDA_HOME: /usr/local/cuda-12.8
+          CPATH: /usr/local/cuda-12.8/include
+          PATH: /usr/local/cuda-12.8/bin:${{ env.PATH }}
         run: |
+          pip install --upgrade pip setuptools wheel
+          pip install torch==2.10.0+cu128 --index-url https://download.pytorch.org/whl/cu128
+          pip install trimesh numpy
           cd DiSo
           python setup.py bdist_wheel
 
