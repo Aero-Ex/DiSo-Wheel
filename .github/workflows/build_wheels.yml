@@ -38,7 +38,7 @@ jobs:
       - name: Clone DiSo
         uses: actions/checkout@v4
         with:
-          repository: YuePan-Robotics/DiSo
+          repository: SarahWeiii/diso
           path: DiSo
 
       - name: Build wheel for diso
