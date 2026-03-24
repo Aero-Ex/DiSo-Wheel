@@ -24,9 +24,9 @@ jobs:
           python-version: ${{ matrix.python }}
 
       - name: Install CUDA
-        uses: jim22k/setup-cuda@v2
+        uses: Jimver/cuda-toolkit@v0.2.20
         with:
-          cuda_version: ${{ matrix.cuda }}
+          cuda: ${{ matrix.cuda }}
 
       - name: Install dependencies
         run: |
