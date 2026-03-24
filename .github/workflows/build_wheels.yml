@@ -1,0 +1,48 @@
+name: Build DiSo Wheels
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }} for Python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+        python: ["3.11"]
+        cuda: ["12.8.0"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install CUDA
+        uses: jim22k/setup-cuda@v2
+        with:
+          cuda_version: ${{ matrix.cuda }}
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip setuptools wheel
+          # We use the index-url to get the specific torch version matching the user's environment
+          pip install torch==2.10.0+cu128 --index-url https://download.pytorch.org/whl/cu128
+          pip install trimesh numpy
+
+      - name: Build wheel for diso
+        run: |
+          git clone https://github.com/YuePan-Robotics/DiSo.git
+          cd DiSo
+          python setup.py bdist_wheel
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: diso-wheels-py${{ matrix.python }}-cu${{ matrix.cuda }}
+          path: DiSo/dist/*.whl
